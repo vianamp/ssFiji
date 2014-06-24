@@ -26,9 +26,10 @@ while (item < _List.length)  {
 		ORIGINAL = getImageID;
 		N = nSlices;
 
-		newImage("Expanded", "16-bit black",getWidth(),getHeight(),N+2*n);
+		newImage("Expanded", "8-bit black",getWidth(),getHeight(),N+2*n);
 		EXPANDED = getImageID;
-	
+
+		max_ai = 0;
 		for (s=1;s<=N;s++) {
 			selectImage(ORIGINAL);
 			setSlice(s);
@@ -36,6 +37,11 @@ while (item < _List.length)  {
 			selectImage(EXPANDED);
 			setSlice(s+n);
 			run("Paste");
+			getStatistics(area, mean, min, max, std);
+			if (mean>max_ai) {
+				max_ai = mean;
+				so = s;
+			}
 		}
 		for (s=1;s<=n;s++) {
 			selectImage(ORIGINAL);
@@ -53,6 +59,8 @@ while (item < _List.length)  {
 			setSlice(N+n+s);
 			run("Paste");	
 		}
+		setSlice(so);
+		resetMinAndMax();
 		run("Save", "save=" +  _RootFolder + "Exp-" + _FileName + ".tif");
 		close();
 		close();
