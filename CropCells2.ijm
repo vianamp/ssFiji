@@ -33,8 +33,8 @@ for (roi = 0; roi < roiManager("count"); roi++) {
 
 	roiManager("Select",roi);
 	_FileName = getInfo("slice.label");
-	_FileName = replace(_FileName,".tif","@");
-	_FileName = split(_FileName,"@");
+	//_FileName = replace(_FileName,".tif","@");
+	_FileName = split(_FileName,"/");
 	_FileName = _FileName[0];
 
 	open(_FileName + ".tif");
