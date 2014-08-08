@@ -16,6 +16,9 @@ _xy = 200;
 
 _RootFolder = getDirectory("Choose a Directory");
 
+// Creating a directory where the files are saved
+File.makeDirectory(_RootFolder + "cells");
+
 setBatchMode(true);
 // Prevent generation of 32bit images
 run("RandomJ Options", "  adopt progress");
@@ -33,6 +36,9 @@ for (roi = 0; roi < roiManager("count"); roi++) {
 
 	roiManager("Select",roi);
 	_FileName = getInfo("slice.label");
+	_FileName = replace(_FileName,".tif","@");
+	_FileName = split(_FileName,"@");
+	_FileName = _FileName[0];
 
 	open(_FileName + ".tif");
 	ORIGINAL = getImageID;
@@ -42,65 +48,39 @@ for (roi = 0; roi < roiManager("count"); roi++) {
 	newImage("CELL","16-bit Black",_xy,_xy,nSlices);
 	CELL = getImageID;
 
-	// Estimating the noise distribution
-	
-	selectImage(ORIGINAL);
-	n = 1000;
-	V = newArray(10*n);
-	for (i=0;i<10*n;i++) {
-		s = 1+round((nSlices-1)*random());
-		setSlice(s);
-		x = round((getWidth()-1)*random());
-		y = round((getHeight()-1)*random());
-		V[i] = getPixel(x,y);
-	}
-	Array.sort(V);
-	vm = 0.0; v2 = 0.0;
-	for (i=0;i<n;i++) {
-		vm += V[i];
-		v2 += V[i]*V[i];
-	}
-	vm /= n; v2 /= n; std = sqrt(v2-vm*vm);
-	print("<v> = " + vm + ", std = " + std);
-	
-	// Adding the estimated noise distribution
-	
-	selectImage(CELL);
-	run("Select All");	
-	//run("Add...", "value=" + vm + " stack");
-	//run("Add Specified Noise...", "stack standard=" + std);
-	run("RandomJ Poisson", "mean=" + vm + " insertion=additive");
-	CELLNOISE = getImageID;
-
+	// Estimating the noise distribution around the ROI
 	max_ai = 0;
 	for (s = 1; s <= nSlices; s++) {
 		selectImage(MAXP);
+		
 		selectImage(ORIGINAL);
 		setSlice(s);
 		run("Restore Selection");
+		run("Make Band...", "band=5");
+		getStatistics(area, mean, min, max, std);
+		run("Restore Selection");
 		run("Copy");
-		selectImage(CELLNOISE);
+		
+		selectImage(CELL);
 		setSlice(s);
-		run("Select None");
+		run("Select None");		
+		run("Add...", "value=" + mean + " slice");
+		run("Add Specified Noise...", "slice standard=" + 0.5*std);
 		run("Paste");
+		
 		getStatistics(area, mean, min, max, std);
 		if (mean>max_ai) {
 			max_ai = mean;
 			slice_max_ai = s;
 		}
+		
 	}
-	setSlice(slice_max_ai);
 	
 	run("Select None");
 	resetMinAndMax();
-	//run("16-bit");
 
-	save(_RootFolder + _FileName + "_" + roi + ".tif");
+	save(_RootFolder + "cells/" + IJ.pad(roi,3) + ".tif");
 
-	//File.makeDirectory(_RootFolder + _FileName + "_" + roi);
-	//run("Save", "save=" + _RootFolder + _FileName + "_" + roi + "/" + _FileName + ".tiff");
-
-	selectImage(CELLNOISE); close();
 	selectImage(CELL); close();
 	selectImage(ORIGINAL); close();
 

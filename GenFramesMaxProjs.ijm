@@ -58,4 +58,4 @@ while (item < _List.length)  {
 
 // Saving max projection stack
 
-//run("Save", "save=" +  _RootFolder + "MaxProjs.tif");
+run("Save", "save=" +  _RootFolder + "MaxProjs.tif");
