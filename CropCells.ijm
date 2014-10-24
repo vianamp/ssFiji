@@ -33,7 +33,7 @@ MAXP = getImageID;
 // For each ROI (cell)
 
 for (roi = 0; roi < roiManager("count"); roi++) {
-
+			
 	roiManager("Select",roi);
 	_FileName = getInfo("slice.label");
 	_FileName = replace(_FileName,".tif","@");
@@ -79,7 +79,8 @@ for (roi = 0; roi < roiManager("count"); roi++) {
 	run("Select None");
 	resetMinAndMax();
 
-	save(_RootFolder + "cells/" + IJ.pad(roi,3) + ".tif");
+	//save(_RootFolder + "cells/" + IJ.pad(roi,3) + ".tif");
+	save(_RootFolder + "cells/" + _FileName + "_" + IJ.pad(roi,3) + ".tif");
 
 	selectImage(CELL); close();
 	selectImage(ORIGINAL); close();
