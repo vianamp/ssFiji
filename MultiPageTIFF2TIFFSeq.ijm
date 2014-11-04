@@ -14,7 +14,7 @@ for (item = 0; item < _List.length; item++) {
 		_FileName = _FileName[0];
 		print(_FileName);
 	
-		open(_RootFolder + "\\" + _FileName + ".tif");
+		open(_RootFolder + "/" + _FileName + ".tif");
 
 		gmax = 0;
 		for (s=1;s<=nSlices;s++) {
@@ -28,8 +28,8 @@ for (item = 0; item < _List.length; item++) {
 		setSlice(smax);
 		resetMinAndMax();
 		run("8-bit");
-		File.makeDirectory(_RootFolder + "\\" + _FileName);
-		run("Image Sequence... ", "format=TIFF name=im start=0 digits=2 save=" + _RootFolder + "\\" + _FileName + "\\im00.tif");
+		File.makeDirectory(_RootFolder + "/" + _FileName);
+		run("Image Sequence... ", "format=TIFF name=im start=0 digits=2 save=" + _RootFolder + "/" + _FileName + "/im00.tif");
 
 		run("Close");
 		
